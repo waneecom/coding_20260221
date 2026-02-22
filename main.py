@@ -11,6 +11,7 @@ if __name__ == "__main__" and not getattr(sys, "frozen", False) and sys.flags.ut
     env["PYTHONIOENCODING"] = "utf-8"
     os.execvpe(sys.executable, [sys.executable, "-X", "utf8"] + sys.argv, env)
 
+
 import re
 import webbrowser
 import urllib.parse
