@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/burpa/vibe_coding/SJW/coding_20260221/**)",
+      "Read(//c/Users/burpa/vibe_coding/SJW//**)",
+      "Read(//c/Users/burpa/vibe_coding/SJW/**)"
+    ]
+  }
+}
