@@ -3,14 +3,13 @@
 
 import sys
 import os
-import subprocess
 
 # UTF-8 모드가 아니면 자동 재시작 (한국어 인코딩 오류 방지)
-if sys.flags.utf8_mode == 0:
+if __name__ == "__main__" and not getattr(sys, "frozen", False) and sys.flags.utf8_mode == 0:
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
-    sys.exit(subprocess.call([sys.executable, "-X", "utf8"] + sys.argv, env=env))
+    os.execvpe(sys.executable, [sys.executable, "-X", "utf8"] + sys.argv, env)
 
 import re
 import webbrowser
@@ -20,10 +19,9 @@ from deep_translator import GoogleTranslator
 
 from PySide6.QtWidgets import (
     QApplication, QDialog, QVBoxLayout, QHBoxLayout,
-    QLabel, QTextEdit, QPushButton, QMessageBox, QComboBox, QLineEdit
+    QLabel, QTextEdit, QPushButton, QMessageBox, QComboBox, QLineEdit, QWidget
 )
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import Qt, QFile, QThread, Signal
+from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QFont
 
 
@@ -431,31 +429,45 @@ class TranslateDialog(BaseDialog):
 # ──────────────────────────────────────────────
 class MainWindow:
     def __init__(self):
-        ui_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "SJW AI1.ui")
-        loader = QUiLoader()
-        ui_file = QFile(ui_path)
-        ui_file.open(QFile.OpenModeFlag.ReadOnly)
-        self.window = loader.load(ui_file)
-        ui_file.close()
+        self.window = QWidget()
+        self.window.setWindowTitle("SJW AI")
+        self.window.resize(380, 240)
 
-        if self.window is None:
-            raise RuntimeError(f"UI 파일 로드 실패: {ui_path}")
+        layout = QVBoxLayout(self.window)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(12)
 
-        self.window.findChild(QPushButton, "pushbutton1").clicked.connect(
-            lambda: SearchDialog(self.window).exec()
-        )
-        self.window.findChild(QPushButton, "pushButton_2").clicked.connect(
-            lambda: SpellCheckDialog(self.window).exec()
-        )
-        self.window.findChild(QPushButton, "pushButton_3").clicked.connect(
-            lambda: TranslateDialog(self.window).exec()
-        )
+        title = QLabel("SJW AI")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title.setStyleSheet("font-size:24px; font-weight:700; color:#1f2937;")
+        layout.addWidget(title)
+
+        subtitle = QLabel("원하는 기능을 선택하세요")
+        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        subtitle.setStyleSheet("font-size:13px; color:#6b7280;")
+        layout.addWidget(subtitle)
+
+        layout.addSpacing(6)
+
+        search_btn = QPushButton("위키백과 검색")
+        spell_btn = QPushButton("맞춤법 검사")
+        trans_btn = QPushButton("번역")
+        for btn in (search_btn, spell_btn, trans_btn):
+            btn.setFixedHeight(42)
+            btn.setStyleSheet(
+                "QPushButton{background:#1976D2;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;}"
+                "QPushButton:hover{background:#1565C0;}"
+            )
+            layout.addWidget(btn)
+
+        search_btn.clicked.connect(lambda: SearchDialog(self.window).exec())
+        spell_btn.clicked.connect(lambda: SpellCheckDialog(self.window).exec())
+        trans_btn.clicked.connect(lambda: TranslateDialog(self.window).exec())
+
+        layout.addStretch()
         self.window.show()
 
 
-# ──────────────────────────────────────────────
-# 실행
-# ──────────────────────────────────────────────
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle("Fusion")

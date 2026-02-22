@@ -5,6 +5,13 @@ build/
 dist/
 wheels/
 *.egg-info
+_MEI*/
 
 # Virtual environments
-.venv
+.venv/
+
+# PyInstaller
+*.spec
+
+# Local tool settings
+.claude/

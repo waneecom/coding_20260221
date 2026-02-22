@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "deep-translator>=1.11.4",
+    "pyinstaller>=6.19.0",
     "pyside6>=6.10.2",
     "requests>=2.32.5",
 ]
